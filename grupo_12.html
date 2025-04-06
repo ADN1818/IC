@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Experimento - Grupo 12</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 30px; }
+        button { font-size: 1.2em; margin: 10px; padding: 10px 20px; }
+        .feedback { margin-top: 20px; font-size: 1.5em; }
+    </style>
+</head>
+<body>
+    <h1>Experimento de Decisão</h1>
+    <p>Número de tentativas: <strong>12</strong></p>
+    <div id="experiment">
+        <p id="trial-number">Tentativa: 1</p>
+        <button onclick="makeChoice('A')">A</button>
+        <button onclick="makeChoice('B')">B</button>
+        <div class="feedback" id="feedback"></div>
+    </div>
+    <script>
+        const maxTrials = 12;
+        let currentTrial = 1;
+        let data = [];
+
+        function makeChoice(choice) {
+            if (currentTrial > maxTrials) return;
+
+            const isReinforced = Math.random() < 0.5;
+            const feedback = isReinforced ? '✔️ Reforço' : '❌ Sem reforço';
+
+            document.getElementById("feedback").textContent = feedback;
+            data.push({ trial: currentTrial, choice: choice, reinforced: isReinforced });
+            currentTrial++;
+
+            if (currentTrial > maxTrials) endExperiment();
+            else document.getElementById("trial-number").textContent = "Tentativa: " + currentTrial;
+        }
+
+        function endExperiment() {
+            document.getElementById("experiment").innerHTML = `
+                <h2>Fim do experimento!</h2>
+                <p>Agora, por favor, responda às perguntas abaixo:</p>
+                <form onsubmit="saveData(event)">
+                    <label>Você sentiu que tinha controle sobre o resultado? (0 a 10):<br>
+                        <input type="number" name="controle" min="0" max="10" required>
+                    </label><br><br>
+                    <label>Você usou alguma estratégia? Qual?<br>
+                        <textarea name="estrategia" rows="4" cols="50"></textarea>
+                    </label><br><br>
+                    <button type="submit">Enviar</button>
+                </form>
+            `;
+        }
+
+        function saveData(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const controle = formData.get("controle");
+            const estrategia = formData.get("estrategia");
+
+            const finalData = { respostas: data, controle: controle, estrategia: estrategia };
+            console.log("Dados do participante:", finalData);
+            document.getElementById("experiment").innerHTML = "<h2>Obrigado por participar!</h2>";
+        }
+    </script>
+</body>
+</html>
